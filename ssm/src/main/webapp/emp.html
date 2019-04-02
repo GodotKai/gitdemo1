@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工信息</title>
+    <script src="js/jquery-3.2.1.js"></script>
+</head>
+<body>
+    <p><input type="button" value="查所有" id="btn1"></p>
+    <ul id="emplist">
+    </ul>
+    <hr>
+    <p>
+        <input id="empno">
+        <input type="button" value="删除" id="btn5">
+        <input type="button" value="查单个" id="btn2">
+    </p>
+    <form id="form1">
+        <p>员工姓名<input id="ename" name="ename"></p>
+        <p>工资<input id="sal" name="sal"></p>
+        <p>职位<input id="job" name="job"></p>
+        <p>入职日期<input type="date" id="hiredate" name="hiredate"></p>
+        <p>部门编号<input id="dno" name="dept.deptno"></p>
+        <p><input type="button" value="添加" id="btn3">
+        <input type="button" value="修改" id="btn4">
+        </p>
+    </form>
+    <script>
+        $(()=>{
+            //查所有
+            $("#btn1").click(()=>{
+                $.ajax({
+                    url:"emps",
+                    type:"get",
+                    dataType:"json",
+                    success:(data)=>{
+                        $("#emplist").empty()
+                        data.forEach(emp=>{
+                            let $li=$(`<li>${emp.ename}</li>`)
+                            $("#emplist").append($li)
+                        })
+                    }
+                })
+            })
+            //查单个
+            $("#btn2").click(()=>{
+                let empno=$("#empno").val()
+                $.ajax({
+                    url:"emps/"+empno,
+                    type:"get",
+                    dataType:"json",
+                    success:(emp)=>{
+                       $("#ename").val(emp.ename)
+                       $("#sal").val(emp.sal)
+                       $("#hiredate").val(emp.hiredate)
+                        $("#dno").val(emp.dept.deptno)
+                    }
+                })
+            })
+
+            //添加
+            $("#btn3").click(()=>{
+                $.ajax({
+                    url:"emps",
+                    type:"post",
+                    data:$("#form1").serialize(),
+                    dataType:"json",
+                    success:(data)=>{
+                        if(data.result>0){
+                            alert("添加成功！")
+                        }
+                    }
+                })
+            })
+            //修改,能修改单表数据，不能修改关联属性的值
+            // $("#btn4").click(()=>{
+            //     let empno=$("#empno").val()
+            //     let obj={'ename':$("#ename").val(),
+            //             'sal':$("#sal").val(),
+            //             'hiredate':$("#hiredate").val(),
+            //             'dept.deptno':$("#dno").val()}
+            //     $.ajax({
+            //         url:"emps/"+empno,
+            //         type:"put",
+            //         contentType:"application/json",
+            //         data:JSON.stringify(obj),
+            //         dataType:"json",
+            //         success:(data)=>{
+            //             if(data.result>0){
+            //                 alert("修改成功！")
+            //             }
+            //         }
+            //     })
+            // })
+
+            $("#btn4").click(()=>{
+                    let empno=$("#empno").val()
+                    let obj={'_method':"put",
+                            'ename':$("#ename").val(),
+                            'sal':$("#sal").val(),
+                            'hiredate':$("#hiredate").val(),
+                            'dept.deptno':$("#dno").val()}
+                    $.ajax({
+                        url:"emps/"+empno,
+                        type:"post",
+                        data:obj,
+                        dataType:"json",
+                        success:(data)=>{
+                            if(data.result>0){
+                                alert("修改成功！")
+                            }
+                        }
+                    })
+            })
+
+            //删除
+            $("#btn5").click(()=>{
+                let empno=$("#empno").val()
+                $.ajax({
+                    url:"emps/"+empno,
+                    type:"delete",
+                    dataType:"json",
+                    success:(data)=>{
+                        if(data.result>0){
+                            alert("删除成功！")
+                        }
+                    }
+                })
+            })
+
+        })
+    </script>
+</body>
+</html>
